@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ahmed Ramadan — Optics Laboratory</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;600&display=swap');
+
+:root {
+  --bg: #05080f;
+  --panel: #080c18;
+  --panel2: #0b1020;
+  --border: #1c2a45;
+  --border2: #243350;
+  --accent: #00c8ff;
+  --accent-glow: rgba(0,200,255,0.15);
+  --amber: #ffb300;
+  --amber-glow: rgba(255,179,0,0.15);
+  --green: #00e5a0;
+  --red: #ff4060;
+  --text: #b8cce4;
+  --text2: #6a8aaa;
+  --dim: #304060;
+  --white: #e8f4ff;
+  --laser-r: #ff2244;
+  --laser-g: #22ff88;
+  --laser-b: #2244ff;
+  --laser-y: #ffdd00;
+  --laser-w: #ffffff;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  height: 52px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 20px;
+  position: relative;
+  z-index: 100;
+}
+
+.logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  color: var(--white);
+  white-space: nowrap;
+}
+.logo span { color: var(--accent); }
+
+.header-tabs {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  position: relative;
+}
+.tab::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform 0.18s;
+}
+.tab:hover { color: var(--text); border-color: var(--border2); }
+.tab.active { color: var(--accent); border-color: var(--accent); background: var(--accent-glow); }
+.tab.active::after { transform: scaleX(1); }
+
+.header-actions { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+
+.btn {
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  border: 1px solid;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.btn-accent { border-color: var(--accent); color: var(--accent); }
+.btn-accent:hover { background: var(--accent-glow); box-shadow: 0 0 12px rgba(0,200,255,0.2); }
+.btn-amber { border-color: var(--amber); color: var(--amber); }
+.btn-amber:hover { background: var(--amber-glow); }
+.btn-green { border-color: var(--green); color: var(--green); }
+.btn-green:hover { background: rgba(0,229,160,0.1); }
+
+/* ===== MAIN LAYOUT ===== */
+.main {
+  display: grid;
+  grid-template-columns: 280px 1fr 260px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ===== LEFT PANEL ===== */
+.left-panel {
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.section {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+}
+.section-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::before {
+  content: '';
+  width: 3px; height: 12px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+/* Param rows */
+.param {
+  margin-bottom: 12px;
+}
+.param-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.param-name {
+  font-size: 0.6rem;
+  color: var(--text2);
+  letter-spacing: 0.05em;
+}
+.param-value {
+  font-size: 0.65rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+.param-value.amber { color: var(--amber); }
+.param-value.green { color: var(--green); }
+
+input[type=range] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 2px;
+  background: var(--border2);
+  outline: none;
+  border-radius: 1px;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--accent);
+  transition: box-shadow 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 14px var(--accent);
+}
+input[type=range].amber::-webkit-slider-thumb { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+input[type=range].green::-webkit-slider-thumb { background: var(--green); box-shadow: 0 0 8px var(--green); }
+
+/* Select */
+select {
+  width: 100%;
+  background: var(--panel2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 6px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  outline: none;
+  cursor: pointer;
+  margin-top: 2px;
+}
+select:focus { border-color: var(--accent); }
+select option { background: var(--panel2); }
+
+/* Toggle */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.6rem;
+  color: var(--text2);
+}
+.switch {
+  width: 32px; height: 16px;
+  background: var(--border2);
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.switch.on { background: var(--accent); }
+.switch.amber.on { background: var(--amber); }
+.switch::after {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  background: var(--white);
+  border-radius: 50%;
+  top: 2px; left: 2px;
+  transition: transform 0.2s;
+}
+.switch.on::after { transform: translateX(16px); }
+
+/* Color buttons */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+.color-btn {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.color-btn.active { border-color: white; transform: scale(1.15); }
+.color-btn:hover { transform: scale(1.1); }
+
+/* ===== CANVAS ===== */
+.canvas-wrap {
+  position: relative;
+  background: #020408;
+  overflow: hidden;
+}
+canvas { display: block; width: 100%; height: 100%; }
+
+.canvas-overlay {
+  position: absolute;
+  top: 10px; left: 10px;
+  display: flex; gap: 8px;
+  pointer-events: none;
+}
+.badge {
+  font-size: 0.58rem;
+  padding: 3px 8px;
+  border: 1px solid;
+  letter-spacing: 0.1em;
+  backdrop-filter: blur(4px);
+}
+.badge-accent { border-color: rgba(0,200,255,0.4); color: var(--accent); background: rgba(0,200,255,0.05); }
+.badge-green { border-color: rgba(0,229,160,0.4); color: var(--green); background: rgba(0,229,160,0.05); }
+
+.canvas-fps {
+  position: absolute;
+  bottom: 10px; left: 10px;
+  font-size: 0.55rem;
+  color: var(--dim);
+  pointer-events: none;
+}
+
+/* ===== RIGHT PANEL ===== */
+.right-panel {
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Data readout */
+.readout {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.readout-label {
+  font-size: 0.55rem;
+  color: var(--text2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.readout-val {
+  font-size: 0.8rem;
+  color: var(--white);
+  font-weight: 600;
+}
+.readout-val.accent { color: var(--accent); }
+.readout-val.amber { color: var(--amber); }
+.readout-val.green { color: var(--green); }
+
+/* Mini chart */
+.mini-chart {
+  width: 100%;
+  height: 80px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+/* Log */
+.log-area {
+  flex: 1;
+  padding: 12px 16px;
+}
+.log-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--amber);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.log-title::before { content: ''; width: 3px; height: 12px; background: var(--amber); display: inline-block; }
+
+.log {
+  font-size: 0.58rem;
+  color: var(--text2);
+  line-height: 1.8;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.log .entry { color: var(--text2); }
+.log .entry.accent { color: var(--accent); }
+.log .entry.amber { color: var(--amber); }
+.log .entry.green { color: var(--green); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--panel); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* Derived values table */
+.derived-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.58rem;
+  margin-bottom: 8px;
+}
+.derived-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--border);
+}
+.derived-table td:first-child { color: var(--text2); }
+.derived-table td:last-child { color: var(--white); text-align: right; font-weight: 600; }
+
+.formula-box {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  padding: 8px 10px;
+  font-size: 0.6rem;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">AHMED <span>RAMADAN</span> · OPTICS LAB</div>
+  <div class="header-tabs">
+    <button class="tab active" data-exp="double_slit">Double Slit</button>
+    <button class="tab" data-exp="single_slit">Single Slit</button>
+    <button class="tab" data-exp="flat_mirror">Flat Mirror</button>
+    <button class="tab" data-exp="concave_mirror">Concave Mirror</button>
+    <button class="tab" data-exp="convex_mirror">Convex Mirror</button>
+    <button class="tab" data-exp="convex_lens">Convex Lens</button>
+    <button class="tab" data-exp="concave_lens">Concave Lens</button>
+    <button class="tab" data-exp="refraction">Refraction</button>
+    <button class="tab" data-exp="tir">Total Internal Refl.</button>
+    <button class="tab" data-exp="thin_film">Thin Film</button>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-accent" id="playBtn">⏸ PAUSE</button>
+    <button class="btn btn-amber" id="logBtn">⊕ LOG POINT</button>
+    <button class="btn btn-green" id="downloadBtn">↓ EXPORT RESULTS</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <!-- Light Source -->
+    <div class="section">
+      <div class="section-title">Light Source</div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">WAVELENGTH (λ)</span>
+          <span class="param-value" id="v_wavelength">550 nm</span>
+        </div>
+        <input type="range" id="s_wavelength" min="380" max="780" value="550">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">SOURCE COLOR</span>
+        </div>
+        <div class="color-grid">
+          <div class="color-btn active" data-wl="650" style="background:#ff2244;" title="Red 650nm"></div>
+          <div class="color-btn" data-wl="589" style="background:#ffaa00;" title="Orange 589nm"></div>
+          <div class="color-btn" data-wl="550" style="background:#88ff00;" title="Green 550nm"></div>
+          <div class="color-btn" data-wl="450" style="background:#2244ff;" title="Blue 450nm"></div>
+          <div class="color-btn" data-wl="405" style="background:#aa00ff;" title="Violet 405nm"></div>
+        </div>
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">BEAM INTENSITY (I)</span>
+          <span class="param-value" id="v_intensity">80 %</span>
+        </div>
+        <input type="range" id="s_intensity" min="5" max="100" value="80">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">SOURCE TYPE</span>
+        </div>
+        <select id="s_sourceType">
+          <option value="plane">Plane Wave (Coherent)</option>
+          <option value="point">Point Source</option>
+          <option value="laser">Collimated Laser</option>
+        </select>
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">INCIDENT ANGLE (θᵢ)</span>
+          <span class="param-value amber" id="v_angle">0 °</span>
+        </div>
+        <input type="range" class="amber" id="s_angle" min="-75" max="75" value="0">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">BEAM WIDTH</span>
+          <span class="param-value" id="v_beamWidth">40 px</span>
+        </div>
+        <input type="range" id="s_beamWidth" min="5" max="120" value="40">
+      </div>
+    </div>
+
+    <!-- Slit / Aperture -->
+    <div class="section" id="sec_slit">
+      <div class="section-title">Aperture / Slit</div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">SLIT WIDTH (a)</span>
+          <span class="param-value" id="v_slitWidth">40 μm</span>
+        </div>
+        <input type="range" id="s_slitWidth" min="5" max="200" value="40">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">SLIT SEPARATION (d)</span>
+          <span class="param-value" id="v_slitSep">150 μm</span>
+        </div>
+        <input type="range" id="s_slitSep" min="30" max="600" value="150">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">SCREEN DISTANCE (L)</span>
+          <span class="param-value" id="v_screenDist">50 cm</span>
+        </div>
+        <input type="range" id="s_screenDist" min="10" max="200" value="50">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">NUMBER OF SLITS</span>
+          <span class="param-value" id="v_numSlits">2</span>
+        </div>
+        <input type="range" id="s_numSlits" min="1" max="8" value="2" step="1">
+      </div>
+    </div>
+
+    <!-- Mirror / Lens -->
+    <div class="section" id="sec_optic">
+      <div class="section-title">Optic Element</div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">FOCAL LENGTH (f)</span>
+          <span class="param-value amber" id="v_focal">150 mm</span>
+        </div>
+        <input type="range" class="amber" id="s_focal" min="20" max="400" value="150">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">RADIUS OF CURVATURE (R)</span>
+          <span class="param-value amber" id="v_radius">300 mm</span>
+        </div>
+        <input type="range" class="amber" id="s_radius" min="40" max="800" value="300">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">OBJECT DISTANCE (u)</span>
+          <span class="param-value green" id="v_objDist">250 mm</span>
+        </div>
+        <input type="range" class="green" id="s_objDist" min="10" max="600" value="250">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">LENS/MIRROR APERTURE</span>
+          <span class="param-value" id="v_aperture">120 mm</span>
+        </div>
+        <input type="range" id="s_aperture" min="30" max="300" value="120">
+      </div>
+
+      <div class="param">
+        <div class="param-header">
+          <span class="param-name">REFRACTIVE INDEX (n)</span>
+          <span class="param-value" id="v_refIndex">1.50</span>
+        </div>
+        <input type="range" id="s_refIndex" min="100" max="250" value="150">
+      </div>
+    </div>
+
+    <!-- Display toggles -->
+    <div class="section">
+      <div class="section-title">Display</div>
+      <div class="toggle-row">Wavefronts <div class="switch on" id="t_waves"></div></div>
+      <div class="toggle-row">Normals <div class="switch on" id="t_normals"></div></div>
+      <div class="toggle-row">Annotations <div class="switch on" id="t_annot"></div></div>
+      <div class="toggle-row">Ray Arrows <div class="switch on" id="t_arrows"></div></div>
+      <div class="toggle-row">Intensity Pattern <div class="switch on" id="t_pattern"></div></div>
+      <div class="toggle-row">Virtual Rays <div class="switch amber on" id="t_virtual"></div></div>
+      <div class="toggle-row">Grid <div class="switch" id="t_grid"></div></div>
+    </div>
+
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrap">
+    <canvas id="sim"></canvas>
+    <div class="canvas-overlay">
+      <div class="badge badge-accent" id="badge_exp">DOUBLE SLIT</div>
+      <div class="badge badge-green" id="badge_live">● LIVE</div>
+    </div>
+    <div class="canvas-fps" id="fps_disp">60 fps</div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="section">
+      <div class="section-title">Measurements</div>
+
+      <div class="readout">
+        <div class="readout-label">Wavelength</div>
+        <div class="readout-val accent" id="r_wavelength">550 nm</div>
+      </div>
+      <div class="readout">
+        <div class="readout-label">Frequency</div>
+        <div class="readout-val" id="r_freq">545 THz</div>
+      </div>
+      <div class="readout">
+        <div class="readout-label">Fringe Spacing (Δy)</div>
+        <div class="readout-val amber" id="r_fringe">— mm</div>
+      </div>
+      <div class="readout">
+        <div class="readout-label">Image Distance (v)</div>
+        <div class="readout-val green" id="r_imgDist">— mm</div>
+      </div>
+      <div class="readout">
+        <div class="readout-label">Magnification (m)</div>
+        <div class="readout-val" id="r_mag">—</div>
+      </div>
+      <div class="readout">
+        <div class="readout-label">Critical Angle (θc)</div>
+        <div class="readout-val" id="r_critical">—</div>
+      </div>
+    </div>
+
+    <!-- Formula -->
+    <div class="section">
+      <div class="section-title">Active Formula</div>
+      <div class="formula-box" id="formula_box">
+        Path diff = d·sinθ = mλ<br>
+        Δy = λL / d<br>
+        Dark: sinθ = (m+½)λ/a
+      </div>
+
+      <div class="section-title" style="margin-top:8px;">Derived Values</div>
+      <table class="derived-table" id="derived_table">
+        <tr><td>λ (nm)</td><td id="d_lambda">550</td></tr>
+        <tr><td>f (THz)</td><td id="d_freq">545</td></tr>
+        <tr><td>E (eV)</td><td id="d_energy">2.25</td></tr>
+        <tr><td>c/λ ratio</td><td id="d_ratio">—</td></tr>
+        <tr><td>m=1 angle</td><td id="d_m1">—</td></tr>
+        <tr><td>Δy (mm)</td><td id="d_fringe">—</td></tr>
+      </table>
+    </div>
+
+    <!-- Intensity mini-chart -->
+    <div class="section">
+      <div class="section-title">Intensity Profile</div>
+      <canvas class="mini-chart" id="miniChart"></canvas>
+    </div>
+
+    <!-- Log -->
+    <div class="log-area">
+      <div class="log-title">Experiment Log</div>
+      <div class="log" id="expLog">
+        <div class="entry accent">[ SYSTEM ] Optics Lab initialized.</div>
+        <div class="entry">[ INFO ] Select experiment tab to begin.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ==================== STATE ====================
+const S = {
+  exp: 'double_slit',
+  wavelength: 650,
+  intensity: 80,
+  angle: 0,
+  beamWidth: 40,
+  slitWidth: 40,
+  slitSep: 150,
+  screenDist: 50,
+  numSlits: 2,
+  focal: 150,
+  radius: 300,
+  objDist: 250,
+  aperture: 120,
+  refIndex: 1.50,
+  sourceType: 'plane',
+  showWaves: true,
+  showNormals: true,
+  showAnnot: true,
+  showArrows: true,
+  showPattern: true,
+  showVirtual: true,
+  showGrid: false,
+  running: true,
+  t: 0,
+  fps: 60,
+  logData: [],
+  frameCount: 0,
+  fpsTimer: 0,
+  lastTime: 0
+};
+
+// ==================== CANVAS ====================
+const canvas = document.getElementById('sim');
+const ctx = canvas.getContext('2d');
+const miniC = document.getElementById('miniChart');
+const miniCtx = miniC.getContext('2d');
+
+function resize() {
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  miniC.width = miniC.clientWidth;
+  miniC.height = miniC.clientHeight;
+}
+resize();
+window.addEventListener('resize', () => { resize(); });
+
+// ==================== UTILS ====================
+function wavToRGB(wl, a=1) {
+  let r,g,b;
+  if(wl<380){r=0.5;g=0;b=0.5;}
+  else if(wl<440){r=(440-wl)/60;g=0;b=1;}
+  else if(wl<490){r=0;g=(wl-440)/50;b=1;}
+  else if(wl<510){r=0;g=1;b=(510-wl)/20;}
+  else if(wl<580){r=(wl-510)/70;g=1;b=0;}
+  else if(wl<645){r=1;g=(645-wl)/65;b=0;}
+  else if(wl<=780){r=1;g=0;b=0;}
+  else{r=0.5;g=0;b=0;}
+  return `rgba(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)},${a})`;
+}
+
+function drawArrow(x1,y1,x2,y2,col,lw=1.5) {
+  const dx=x2-x1, dy=y2-y1, len=Math.sqrt(dx*dx+dy*dy);
+  if(len<2) return;
+  const ux=dx/len, uy=dy/len;
+  const aLen=8;
+  ctx.strokeStyle=col; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-ux*aLen+uy*aLen*0.4, y2-uy*aLen-ux*aLen*0.4);
+  ctx.lineTo(x2-ux*aLen-uy*aLen*0.4, y2-uy*aLen+ux*aLen*0.4);
+  ctx.closePath();
+  ctx.fillStyle=col; ctx.fill();
+}
+
+function glowAt(x,y,r,col) {
+  const g=ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,col); g.addColorStop(1,'transparent');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+}
+
+function label(text,x,y,col='rgba(180,220,255,0.7)',size=10) {
+  ctx.fillStyle=col; ctx.font=`${size}px JetBrains Mono`;
+  ctx.fillText(text,x,y);
+}
+
+function drawGrid(W,H) {
+  ctx.strokeStyle='rgba(28,42,69,0.4)'; ctx.lineWidth=0.5;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+
+// ==================== EXPERIMENTS ====================
+
+// --- DOUBLE / SINGLE SLIT ---
+function expSlits(W,H,isSingle) {
+  const cw=wavToRGB(S.wavelength);
+  const intF=S.intensity/100;
+  const barrierX=W*0.38;
+  const screenX=W*0.88;
+  const nSlits=isSingle?1:S.numSlits;
+  const d=S.slitSep;
+  const a=S.slitWidth;
+
+  if(S.showGrid) drawGrid(W,H);
+
+  // Wavefronts from source
+  if(S.showWaves) {
+    const srcX=W*0.06;
+    for(let i=0;i<10;i++) {
+      const r=((S.t*0.9+i*45)%(barrierX-srcX-10))+5;
+      const al=(1-r/(barrierX-srcX))*0.4*intF;
+      ctx.beginPath();ctx.arc(srcX,H/2,r,0,Math.PI*2);
+      ctx.strokeStyle=wavToRGB(S.wavelength,al);ctx.lineWidth=1;ctx.stroke();
+    }
+  }
+
+  // Barrier
+  ctx.fillStyle='#0f1c35';
+  ctx.fillRect(barrierX-6,0,12,H);
+  ctx.fillStyle='rgba(28,58,100,0.8)';
+  ctx.fillRect(barrierX-6,0,12,H);
+
+  // Slit positions
+  const slitPositions=[];
+  if(nSlits===1) {
+    slitPositions.push(H/2);
+  } else {
+    for(let i=0;i<nSlits;i++) {
+      slitPositions.push(H/2 + (i-(nSlits-1)/2)*d*0.5);
+    }
+  }
+
+  // Open slits
+  slitPositions.forEach(sy=>{
+    ctx.fillStyle='#020408';
+    ctx.fillRect(barrierX-7,sy-a*0.25,14,a*0.5);
+  });
+
+  // Diffracted waves from each slit
+  if(S.showWaves) {
+    slitPositions.forEach(sy=>{
+      for(let i=0;i<7;i++) {
+        const r=((S.t*0.9+i*50)%(screenX-barrierX-10))+5;
+        const al=(1-r/(screenX-barrierX))*0.3*intF;
+        ctx.beginPath();
+        ctx.arc(barrierX,sy,r,-Math.PI*0.75,Math.PI*0.75);
+        ctx.strokeStyle=wavToRGB(S.wavelength,al);ctx.lineWidth=1;ctx.stroke();
+      }
+    });
+  }
+
+  // Diffraction pattern on screen
+  if(S.showPattern) {
+    const pw=45;
+    for(let py=0;py<H;py++) {
+      const theta=Math.atan2(py-H/2, screenX-barrierX);
+      const sinT=Math.sin(theta);
+      const k=2*Math.PI/(S.wavelength*1e-9)*1e-3;
+      const alpha_b=k*(a*1e-6)*sinT/2;
+      const singleEnv=(Math.abs(alpha_b)<0.001)?1:Math.pow(Math.sin(alpha_b)/alpha_b,2);
+
+      let totalI=0;
+      if(nSlits===1) {
+        totalI=singleEnv;
+      } else {
+        let realSum=0,imagSum=0;
+        slitPositions.forEach(sy=>{
+          const pathDiff=(sy-H/2)*sinT*0.01;
+          const phase=2*Math.PI*pathDiff/(S.wavelength*0.001);
+          realSum+=Math.cos(phase);
+          imagSum+=Math.sin(phase);
+        });
+        totalI=singleEnv*(realSum*realSum+imagSum*imagSum)/(nSlits*nSlits);
+      }
+
+      totalI=Math.max(0,Math.min(1,totalI))*intF;
+      ctx.fillStyle=wavToRGB(S.wavelength,totalI*0.95);
+      ctx.fillRect(screenX-pw/2,py,pw,1);
+    }
+    ctx.strokeStyle='rgba(180,210,255,0.08)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(screenX-pw/2,0);ctx.lineTo(screenX-pw/2,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(screenX+pw/2,0);ctx.lineTo(screenX+pw/2,H);ctx.stroke();
+  }
+
+  // Annotations
+  if(S.showAnnot) {
+    ctx.fillStyle='rgba(0,200,255,0.65)'; ctx.font='10px JetBrains Mono';
+    ctx.fillText('SOURCE',W*0.02,16);
+    ctx.fillText('BARRIER',barrierX-30,16);
+    ctx.fillText('SCREEN',screenX-20,16);
+    ctx.fillStyle='rgba(255,179,0,0.65)';
+    ctx.fillText(`λ=${S.wavelength}nm`,W*0.02,H-8);
+    ctx.fillText(`a=${a}μm`,barrierX+10,H-8);
+    if(!isSingle) ctx.fillText(`d=${d}μm`,barrierX+10,H-22);
+    ctx.fillText(`L=${S.screenDist}cm`,W*0.6,H-8);
+
+    // Central axis
+    ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.setLineDash([5,8]);
+    ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,107,53,0.6)';
+    ctx.fillText('m=0',screenX+5,H/2+4);
+  }
+}
+
+// --- FLAT MIRROR ---
+function expFlatMirror(W,H) {
+  if(S.showGrid) drawGrid(W,H);
+  const intF=S.intensity/100;
+  const mirX=W*0.55, mirY=H/2;
+  const mirLen=H*0.6;
+  const tiltRad=S.angle*Math.PI/180;
+
+  // Draw mirror
+  ctx.save(); ctx.translate(mirX,mirY); ctx.rotate(tiltRad);
+  const mGrad=ctx.createLinearGradient(-10,-mirLen/2,-1,-mirLen/2);
+  mGrad.addColorStop(0,'#0f1c35');mGrad.addColorStop(0.5,'#3a5570');mGrad.addColorStop(1,'#0f1c35');
+  ctx.fillStyle=mGrad; ctx.fillRect(-10,-mirLen/2,14,mirLen);
+  // Reflective face
+  ctx.fillStyle='rgba(160,210,255,0.3)'; ctx.fillRect(-2,-mirLen/2,5,mirLen);
+  // Normal
+  if(S.showNormals) {
+    ctx.strokeStyle='rgba(100,150,220,0.4)'; ctx.setLineDash([5,6]);
+    ctx.lineWidth=1; ctx.beginPath();ctx.moveTo(0,-90);ctx.lineTo(0,90);ctx.stroke();
+    ctx.setLineDash([]);
+    if(S.showAnnot){ctx.fillStyle='rgba(100,150,220,0.6)';ctx.font='9px JetBrains Mono';ctx.fillText('N',4,-70);}
+  }
+  ctx.restore();
+
+  // Incident ray direction
+  const incAngle=(-45+S.angle)*Math.PI/180;
+  const srcX=W*0.12, srcY=H*0.18;
+  // Find intersection with mirror
+  const dx=Math.cos(incAngle), dy=Math.sin(incAngle);
+  // Mirror line: point mirX,mirY, direction (cos tilt, sin tilt)
+  const mx=mirX, my=mirY;
+  const mdx=Math.cos(tiltRad), mdy=Math.sin(tiltRad);
+  const denom=dx*mdy-dy*mdx;
+  let hitX=mx, hitY=my;
+  if(Math.abs(denom)>0.001) {
+    const t=((mx-srcX)*mdy-(my-srcY)*mdx)/denom;
+    hitX=srcX+dx*t; hitY=srcY+dy*t;
+    if(hitY<0||hitY>H||hitX<0||hitX>W){hitX=mx;hitY=my;}
+  }
+
+  // Incident ray
+  const iGrad=ctx.createLinearGradient(srcX,srcY,hitX,hitY);
+  iGrad.addColorStop(0,'transparent');iGrad.addColorStop(1,wavToRGB(S.wavelength,0.9*intF));
+  if(S.showArrows) drawArrow(srcX,srcY,hitX,hitY,wavToRGB(S.wavelength,0.9*intF));
+  else {ctx.strokeStyle=wavToRGB(S.wavelength,0.9*intF);ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(srcX,srcY);ctx.lineTo(hitX,hitY);ctx.stroke();}
+
+  // Reflection direction
+  const mirNorm=tiltRad+Math.PI/2;
+  const incDir=Math.atan2(dy,dx);
+  const relAngle=incDir-mirNorm;
+  const reflDir=mirNorm+(Math.PI-relAngle);
+  const refLen=Math.max(W,H)*1.5;
+  const rEX=hitX+Math.cos(reflDir)*refLen;
+  const rEY=hitY+Math.sin(reflDir)*refLen;
+
+  // Reflected ray
+  const rGrad=ctx.createLinearGradient(hitX,hitY,rEX,rEY);
+  rGrad.addColorStop(0,wavToRGB(S.wavelength,0.9*intF));
+  rGrad.addColorStop(0.4,wavToRGB(S.wavelength,0.3*intF));
+  rGrad.addColorStop(1,'transparent');
+  ctx.strokeStyle=rGrad;ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(hitX,hitY);ctx.lineTo(rEX,rEY);ctx.stroke();
+  if(S.showArrows) drawArrow(hitX,hitY,hitX+Math.cos(reflDir)*100,hitY+Math.sin(reflDir)*100,wavToRGB(S.wavelength,0.8*intF));
+
+  // Glow at hit
+  glowAt(hitX,hitY,22,wavToRGB(S.wavelength,0.7));
+
+  // Angle arcs
+  if(S.showAnnot) {
+    const iAng=Math.abs(Math.round(incDir*180/Math.PI-mirNorm*180/Math.PI+180));
+    const rAng=iAng;
+    ctx.strokeStyle='rgba(255,179,0,0.5)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(hitX,hitY,40,mirNorm-0.1,incDir,true);ctx.stroke();
+    ctx.fillStyle='rgba(255,179,0,0.8)';ctx.font='10px JetBrains Mono';
+    ctx.fillText(`θᵢ`,hitX-55,hitY-10);
+    ctx.fillText(`θᵣ`,hitX+30,hitY-10);
+    ctx.fillStyle='rgba(0,200,255,0.6)';ctx.font='10px JetBrains Mono';
+    ctx.fillText('INCIDENT RAY',srcX-10,srcY-10);
+    ctx.fillText('REFLECTED RAY',hitX+20,hitY-35);
+    ctx.fillStyle='rgba(255,179,0,0.6)';
+    ctx.fillText('LAW: θᵢ = θᵣ',W*0.02,H-8);
+    ctx.fillText(`θᵢ = ${Math.abs(S.angle)}°`,W*0.02,H-24);
+  }
+
+  // Source dot
+  ctx.beginPath();ctx.arc(srcX,srcY,5,0,Math.PI*2);
+  ctx.fillStyle=wavToRGB(S.wavelength,intF);ctx.fill();
+  glowAt(srcX,srcY,15,wavToRGB(S.wavelength,0.5));
+}
+
+// --- CURVED MIRROR (concave/convex) ---
+function expCurvedMirror(W,H,isConcave) {
+  if(S.showGrid) drawGrid(W,H);
+  const intF=S.intensity/100;
+  const cx=W*0.55, cy=H/2;
+  const f=S.focal*0.6;
+  const R=S.radius*0.6;
+  const u=S.objDist*0.6;
+  const aperH=Math.min(S.aperture*0.5, H*0.45);
+
+  // Mirror geometry
+  const mirCenterX=isConcave ? cx+R : cx-R;
+  const startAng=isConcave ? Math.PI*0.65 : -Math.PI*0.35;
+  const endAng=isConcave ? Math.PI*1.35 : Math.PI*0.35;
+
+  ctx.beginPath();
+  ctx.arc(mirCenterX,cy,R,startAng,endAng,!isConcave);
+  ctx.strokeStyle='#3a5570'; ctx.lineWidth=10; ctx.stroke();
+  ctx.strokeStyle='rgba(160,210,255,0.3)'; ctx.lineWidth=4; ctx.stroke();
+
+  // Principal axis
+  ctx.strokeStyle='rgba(100,150,200,0.2)';ctx.setLineDash([6,8]);ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();ctx.setLineDash([]);
+
+  // Focal point
+  const focalX=isConcave ? cx-f : cx+f;
+  ctx.beginPath();ctx.arc(focalX,cy,5,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,100,50,0.9)';ctx.fill();
+  glowAt(focalX,cy,16,`rgba(255,100,50,0.5)`);
+
+  // Center of curvature
+  const rcX=isConcave ? cx-R : cx+R;
+  ctx.beginPath();ctx.arc(rcX,cy,4,0,Math.PI*2);
+  ctx.fillStyle='rgba(168,85,247,0.7)';ctx.fill();
+
+  // Object arrow
+  const objX=isConcave ? cx-u : cx+u;
+  const objH=60;
+  ctx.strokeStyle='rgba(0,229,160,0.8)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(objX,cy);ctx.lineTo(objX,cy-objH);ctx.stroke();
+  drawArrow(objX,cy+objH*0.3,objX,cy-objH*0.3,'rgba(0,229,160,0.8)',2);
+  if(S.showAnnot){label('OBJ',objX+5,cy-objH-5,'rgba(0,229,160,0.7)');}
+
+  // Mirror formula: 1/v = 1/f - 1/u (sign convention)
+  let v_calc;
+  const sign=isConcave?1:-1;
+  const f_s=sign*f;
+  v_calc=1/(1/f_s+1/u);
+  const imgX=isConcave ? cx-v_calc : cx+v_calc;
+  const m_calc=-v_calc/u;
+
+  // Image arrow
+  if(Math.abs(v_calc)<W && !isNaN(v_calc)) {
+    const imgH=Math.abs(m_calc)*objH;
+    const imgDir=m_calc<0?-1:1;
+    ctx.strokeStyle='rgba(255,179,0,0.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(imgX,cy);ctx.lineTo(imgX,cy-imgDir*imgH);ctx.stroke();
+    ctx.setLineDash([]);
+    if(S.showAnnot){label('IMG',imgX+5,cy-imgDir*imgH-5,'rgba(255,179,0,0.7)');}
+    glowAt(imgX,cy,12,`rgba(255,179,0,0.2)`);
+  }
+
+  // Rays
+  const numRays=5;
+  for(let i=0;i<numRays;i++) {
+    const yOff=(i/(numRays-1)-0.5)*aperH*2;
+    const rY=cy+yOff;
+    const srcX=isConcave ? cx-u-30 : cx+u+30;
+
+    // Incident
+    const iCol=wavToRGB(S.wavelength,0.75*intF);
+    if(isConcave) drawArrow(srcX,rY,cx-5,rY,iCol,1.5);
+    else drawArrow(srcX,rY,cx+5,rY,iCol,1.5);
+
+    // After reflection
+    let refDX, refDY;
+    if(isConcave) {
+      refDX=focalX-(cx-5); refDY=cy-rY;
+    } else {
+      refDX=cx+5-focalX; refDY=rY-cy;
+    }
+    const rLen=Math.sqrt(refDX*refDX+refDY*refDY)||1;
+    refDX/=rLen; refDY/=rLen;
+
+    const refEndX=(isConcave?cx-5:cx+5)+refDX*W*0.6;
+    const refEndY=(isConcave?rY:rY)+refDY*W*0.6;
+
+    const rGrad=ctx.createLinearGradient(cx,rY,refEndX,refEndY);
+    rGrad.addColorStop(0,wavToRGB(S.wavelength,0.8*intF));
+    rGrad.addColorStop(1,wavToRGB(S.wavelength,0.05));
+    ctx.strokeStyle=rGrad;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(isConcave?cx-5:cx+5,rY);ctx.lineTo(refEndX,refEndY);ctx.stroke();
+
+    glowAt(isConcave?cx-5:cx+5,rY,6,wavToRGB(S.wavelength,0.5));
+  }
+
+  // Annotations
+  if(S.showAnnot) {
+    ctx.fillStyle='rgba(255,100,50,0.8)';ctx.font='10px JetBrains Mono';
+    ctx.fillText('F',focalX-4,cy-10);
+    ctx.fillStyle='rgba(168,85,247,0.8)';
+    ctx.fillText('C',rcX-4,cy-10);
+    ctx.fillStyle='rgba(0,200,255,0.7)';ctx.font='10px JetBrains Mono';
+    ctx.fillText(isConcave?'CONCAVE MIRROR':'CONVEX MIRROR',W*0.02,16);
+    ctx.fillStyle='rgba(255,179,0,0.6)';
+    ctx.fillText(`f=${S.focal}mm  u=${S.objDist}mm  v=${Math.round(v_calc)}mm`,W*0.02,H-8);
+    ctx.fillText(`m=${m_calc.toFixed(2)}  R=${S.radius}mm`,W*0.02,H-24);
+    ctx.fillText(`Mirror eq: 1/v + 1/u = 1/f`,W*0.02,H-40);
+  }
+
+  // Update readouts
+  document.getElementById('r_imgDist').textContent=`${Math.round(v_calc)} mm`;
+  document.getElementById('r_mag').textContent=m_calc.toFixed(3);
+}
+
+// --- LENS (convex/concave) ---
+function expLens(W,H,isConvex) {
+  if(S.showGrid) drawGrid(W,H);
+  const intF=S.intensity/100;
+  const cx=W/2, cy=H/2;
+  const f=S.focal*0.5;
+  const u=S.objDist*0.5;
+  const aperH=Math.min(S.aperture*0.45,H*0.43);
+
+  // Draw lens
+  ctx.save();ctx.translate(cx,cy);
+  const lensW=isConvex?18:8;
+  ctx.beginPath();
+  if(isConvex) {
+    ctx.moveTo(0,-aperH);
+    ctx.quadraticCurveTo(lensW,-aperH*0.5,lensW,0);
+    ctx.quadraticCurveTo(lensW,aperH*0.5,0,aperH);
+    ctx.quadraticCurveTo(-lensW,aperH*0.5,-lensW,0);
+    ctx.quadraticCurveTo(-lensW,-aperH*0.5,0,-aperH);
+  } else {
+    ctx.moveTo(-4,-aperH); ctx.lineTo(4,-aperH);
+    ctx.quadraticCurveTo(-6,0,4,aperH);
+    ctx.lineTo(-4,aperH);
+    ctx.quadraticCurveTo(6,0,-4,-aperH);
+  }
+  ctx.closePath();
+  ctx.fillStyle='rgba(0,180,255,0.08)';ctx.fill();
+  ctx.strokeStyle='rgba(0,180,255,0.6)';ctx.lineWidth=2;ctx.stroke();
+  ctx.restore();
+
+  // Principal axis
+  ctx.strokeStyle='rgba(100,150,200,0.2)';ctx.setLineDash([6,8]);ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();ctx.setLineDash([]);
+
+  // Focal points
+  const f1X=cx-f, f2X=cx+f;
+  [f1X,f2X].forEach(fx=>{
+    ctx.beginPath();ctx.arc(fx,cy,5,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,100,50,0.9)';ctx.fill();
+    glowAt(fx,cy,14,`rgba(255,100,50,0.4)`);
+    if(S.showAnnot) label('F',fx-4,cy-12,'rgba(255,100,50,0.8)');
+  });
+
+  // Thin lens: 1/v - 1/u = 1/f (real-is-positive for lens)
+  const u_s = -u; // object on left, u negative in standard convention
+  const v_s = 1/(1/f + 1/u_s);
+  const imgX=cx+v_s;
+  const m_calc=v_s/u_s;
+  const objH=55;
+
+  // Object
+  const objX=cx-u;
+  ctx.strokeStyle='rgba(0,229,160,0.8)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(objX,cy);ctx.lineTo(objX,cy-objH);ctx.stroke();
+  drawArrow(objX,cy+20,objX,cy-objH,'rgba(0,229,160,0.8)',2);
+  if(S.showAnnot) label('OBJ',objX+5,cy-objH-5,'rgba(0,229,160,0.7)');
+
+  // Image
+  if(Math.abs(imgX-cx)<W*0.5 && !isNaN(v_s)) {
+    const iH=Math.abs(m_calc*objH);
+    const iDir=m_calc<0?-1:1;
+    const virt=v_s<0;
+    ctx.strokeStyle=virt?'rgba(255,179,0,0.4)':'rgba(255,179,0,0.8)';
+    ctx.lineWidth=virt?1:1.5;
+    if(virt) ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(imgX,cy);ctx.lineTo(imgX,cy-iDir*iH);ctx.stroke();
+    ctx.setLineDash([]);
+    if(S.showAnnot) label(virt?'IMG(V)':'IMG',imgX+5,cy-iDir*iH-5,'rgba(255,179,0,0.7)');
+  }
+
+  // 3 principal rays
+  const rayColors=[wavToRGB(S.wavelength,0.8*intF),wavToRGB(S.wavelength,0.65*intF),wavToRGB(S.wavelength,0.5*intF)];
+
+  // Ray 1: parallel to axis → through f2
+  drawArrow(objX,cy-objH,cx,cy-objH,rayColors[0],1.5);
+  if(!isNaN(v_s) && Math.abs(imgX-cx)<W*0.6) {
+    const endX=imgX+(imgX-cx)*0.5;
+    const endY=(cy-objH*Math.abs(m_calc))+(imgX-cx)*0.5*((cy-objH*Math.abs(m_calc))-(cy-objH))/(imgX-cx+0.001);
+    let rg=ctx.createLinearGradient(cx,cy-objH,f2X,cy);
+    rg.addColorStop(0,rayColors[0]);rg.addColorStop(1,wavToRGB(S.wavelength,0.1));
+    ctx.strokeStyle=rg;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(cx,cy-objH);ctx.lineTo(f2X*1.5,cy+(cy-objH)*(-v_s/f));ctx.stroke();
+  }
+
+  // Ray 2: through center
+  {
+    const rg=ctx.createLinearGradient(objX,cy-objH,imgX,cy+objH*m_calc);
+    rg.addColorStop(0,'transparent');rg.addColorStop(0.3,rayColors[1]);rg.addColorStop(1,wavToRGB(S.wavelength,0.05));
+    ctx.strokeStyle=rg;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(objX,cy-objH);ctx.lineTo(imgX,cy-objH*m_calc);ctx.stroke();
+  }
+
+  // Ray 3: through f1 → parallel
+  drawArrow(objX,cy-objH,f1X,cy,rayColors[2],1.5);
+  {
+    const rg=ctx.createLinearGradient(cx,cy-objH,cx+W*0.4,cy-objH);
+    rg.addColorStop(0,rayColors[2]);rg.addColorStop(1,'transparent');
+    ctx.strokeStyle=rg;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(cx,cy-objH);ctx.lineTo(cx+W*0.5,cy-objH);ctx.stroke();
+  }
+
+  if(S.showAnnot) {
+    ctx.fillStyle='rgba(0,200,255,0.7)';ctx.font='10px JetBrains Mono';
+    ctx.fillText(isConvex?'CONVEX LENS (Converging)':'CONCAVE LENS (Diverging)',W*0.02,16);
+    ctx.fillStyle='rgba(255,179,0,0.6)';
+    ctx.fillText(`f=${S.focal}mm  u=${S.objDist}mm  v=${Math.round(v_s)}mm`,W*0.02,H-8);
+    ctx.fillText(`m=${m_calc.toFixed(3)}  |m|=${Math.abs(m_calc).toFixed(3)}`,W*0.02,H-24);
+    ctx.fillText('Lens eq: 1/v - 1/u = 1/f',W*0.02,H-40);
+  }
+
+  document.getElementById('r_imgDist').textContent=`${Math.round(v_s)} mm`;
+  document.getElementById('r_mag').textContent=m_calc.toFixed(3);
+}
+
+// --- REFRACTION (Snell's Law) ---
+function expRefraction(W,H) {
+  if(S.showGrid) drawGrid(W,H);
+  const intF=S.intensity/100;
+  const n1=1.0, n2=S.refIndex;
+  const iAng=(Math.abs(S.angle)+5)*Math.PI/180;
+
+  // Media
+  ctx.fillStyle='rgba(0,30,60,0.25)';ctx.fillRect(0,H/2,W,H/2);
+  ctx.strokeStyle='rgba(0,200,255,0.2)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+
+  // Labels
+  if(S.showAnnot) {
+    ctx.fillStyle='rgba(0,200,255,0.4)';ctx.font='11px JetBrains Mono';
+    ctx.fillText(`AIR  n₁ = 1.000`,W*0.02,H/2-12);
+    ctx.fillText(`MEDIUM  n₂ = ${n2.toFixed(3)}`,W*0.02,H/2+22);
+  }
+
+  const hitX=W/2, hitY=H/2;
+  const rayLen=Math.max(W,H)*0.5;
+
+  // Normal
+  if(S.showNormals) {
+    ctx.strokeStyle='rgba(100,150,220,0.35)';ctx.setLineDash([5,7]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(hitX,hitY-110);ctx.lineTo(hitX,hitY+110);ctx.stroke();ctx.setLineDash([]);
+  }
+
+  // Incident ray
+  const incSX=hitX-Math.sin(iAng)*rayLen;
+  const incSY=hitY-Math.cos(iAng)*rayLen;
+  const incGrad=ctx.createLinearGradient(incSX,incSY,hitX,hitY);
+  incGrad.addColorStop(0,'transparent');incGrad.addColorStop(1,wavToRGB(S.wavelength,0.9*intF));
+  if(S.showArrows) drawArrow(incSX+(hitX-incSX)*0.3,incSY+(hitY-incSY)*0.3,hitX,hitY,wavToRGB(S.wavelength,0.9*intF),2.5);
+  else {ctx.strokeStyle=wavToRGB(S.wavelength,0.9*intF);ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(incSX,incSY);ctx.lineTo(hitX,hitY);ctx.stroke();}
+
+  // Snell's law
+  const sinR=n1*Math.sin(iAng)/n2;
+  const isTIR=sinR>1;
+  let refracted_angle=0;
+
+  if(!isTIR) {
+    refracted_angle=Math.asin(sinR);
+    const refX=hitX+Math.sin(refracted_angle)*rayLen;
+    const refY=hitY+Math.cos(refracted_angle)*rayLen;
+    const refGrad=ctx.createLinearGradient(hitX,hitY,refX,refY);
+    refGrad.addColorStop(0,wavToRGB(S.wavelength,0.9*intF));
+    refGrad.addColorStop(1,wavToRGB(S.wavelength,0.1));
+    if(S.showArrows) drawArrow(hitX,hitY,hitX+Math.sin(refracted_angle)*100,hitY+Math.cos(refracted_angle)*100,wavToRGB(S.wavelength,0.9*intF),2.5);
+    ctx.strokeStyle=refGrad;ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(hitX,hitY);ctx.lineTo(refX,refY);ctx.stroke();
+  }
+
+  // Partial reflection
+  const reflX=hitX+Math.sin(iAng)*rayLen*0.4;
+  const reflY=hitY-Math.cos(iAng)*rayLen*0.4;
+  const rIntensity=isTIR?0.9:0.25;
+  const rGrad=ctx.createLinearGradient(hitX,hitY,reflX,reflY);
+  rGrad.addColorStop(0,wavToRGB(S.wavelength,rIntensity*intF));
+  rGrad.addColorStop(1,wavToRGB(S.wavelength,0.05));
+  ctx.strokeStyle=rGrad;ctx.lineWidth=isTIR?2.5:1;
+  ctx.beginPath();ctx.moveTo(hitX,hitY);ctx.lineTo(reflX,reflY);ctx.stroke();
+
+  glowAt(hitX,hitY,28,wavToRGB(S.wavelength,0.7));
+
+  // TIR label
+  if(isTIR && S.showAnnot) {
+    ctx.fillStyle='rgba(255,64,96,0.9)';ctx.font='12px JetBrains Mono';
+    ctx.fillText('⚠ TOTAL INTERNAL REFLECTION',hitX-100,hitY-130);
+  }
+
+  // Angle annotations
+  if(S.showAnnot) {
+    ctx.fillStyle='rgba(255,179,0,0.8)';ctx.font='10px JetBrains Mono';
+    ctx.fillText(`θᵢ = ${Math.round(iAng*180/Math.PI)}°`,hitX-80,hitY-45);
+    if(!isTIR) ctx.fillText(`θₜ = ${Math.round(refracted_angle*180/Math.PI)}°`,hitX+25,hitY+55);
+    ctx.fillStyle='rgba(0,200,255,0.6)';
+    ctx.fillText(`n₁sinθᵢ = n₂sinθₜ`,W*0.02,H-8);
+    const critA=Math.asin(n1/n2)*180/Math.PI;
+    if(n2>n1) ctx.fillText(`θc = ${critA.toFixed(1)}°`,W*0.02,H-24);
+  }
+
+  const critA=n2>1?Math.asin(1/n2)*180/Math.PI:null;
+  document.getElementById('r_critical').textContent=critA?`${critA.toFixed(2)}°`:'N/A';
+}
+
+// --- TOTAL INTERNAL REFLECTION ---
+function expTIR(W,H) {
+  // Set refIndex high and show TIR
+  const savedAngle=S.angle;
+  S.angle=Math.max(Math.abs(S.angle),40);
+  expRefraction(W,H);
+  S.angle=savedAngle;
+
+  const n2=S.refIndex;
+  const critA=Math.asin(1.0/n2)*180/Math.PI;
+  if(S.showAnnot) {
+    ctx.fillStyle='rgba(255,64,96,0.7)';ctx.font='11px JetBrains Mono';
+    ctx.fillText(`Critical Angle θc = ${critA.toFixed(2)}°`,W/2-80,30);
+    ctx.fillText(`n = ${n2.toFixed(3)}   sin(θc) = 1/n`,W/2-80,48);
+  }
+}
+
+// --- THIN FILM INTERFERENCE ---
+function expThinFilm(W,H) {
+  if(S.showGrid) drawGrid(W,H);
+  const intF=S.intensity/100;
+  const filmT=S.slitWidth*2; // use slitWidth as film thickness proxy
+  const n=S.refIndex;
+  const wl=S.wavelength;
+
+  // Draw film layers
+  const filmTop=H*0.3, filmBot=H*0.55;
+  ctx.fillStyle='rgba(0,100,180,0.15)';ctx.fillRect(0,filmTop,W,filmBot-filmTop);
+  ctx.strokeStyle='rgba(0,200,255,0.3)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,filmTop);ctx.lineTo(W,filmTop);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,filmBot);ctx.lineTo(W,filmBot);ctx.stroke();
+
+  if(S.showAnnot) {
+    label('AIR (n=1.00)',W*0.02,filmTop-10,'rgba(0,200,255,0.5)');
+    label(`FILM (n=${n.toFixed(2)}, t=${filmT}nm)`,W*0.02,filmTop+18,'rgba(0,200,255,0.7)');
+    label('GLASS (n=1.52)',W*0.02,filmBot+18,'rgba(0,200,255,0.5)');
+  }
+
+  // Optical path difference: OPD = 2nt (at normal incidence)
+  const OPD=2*n*filmT;
+  const order=OPD/wl;
+  const isConstructive=Math.abs(order-Math.round(order))<0.15;
+  const iDestr=Math.abs(order-Math.round(order+0.5)+0.5)<0.15;
+
+  // Show multiple incident rays across width
+  const nRays=12;
+  for(let i=0;i<nRays;i++) {
+    const rx=W*0.1+i*(W*0.8/nRays);
+    const ang=(S.angle*0.5)*Math.PI/180;
+
+    // Incident ray
+    const iSY=filmTop-60;
+    const hitT_X=rx+Math.tan(ang)*60;
+    const incG=ctx.createLinearGradient(rx,iSY,hitT_X,filmTop);
+    incG.addColorStop(0,'transparent');incG.addColorStop(1,wavToRGB(wl,0.7*intF));
+    ctx.strokeStyle=wavToRGB(wl,0.6*intF);ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(rx,iSY);ctx.lineTo(hitT_X,filmTop);ctx.stroke();
+
+    // Reflected from top surface
+    const r1X=hitT_X-Math.tan(ang)*40;
+    const r1G=ctx.createLinearGradient(hitT_X,filmTop,r1X,filmTop-40);
+    r1G.addColorStop(0,wavToRGB(wl,0.5*intF));r1G.addColorStop(1,'transparent');
+    ctx.strokeStyle=r1G;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(hitT_X,filmTop);ctx.lineTo(r1X,filmTop-40);ctx.stroke();
+
+    // Ray through film
+    const hitB_X=hitT_X+Math.tan(ang)*(filmBot-filmTop);
+    ctx.strokeStyle=wavToRGB(wl,0.4*intF);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(hitT_X,filmTop);ctx.lineTo(hitB_X,filmBot);ctx.stroke();
+
+    // Reflected from bottom
+    const r2X=hitB_X-Math.tan(ang)*(filmBot-filmTop);
+    const r2_topX=r2X-Math.tan(ang)*40;
+    ctx.strokeStyle=wavToRGB(wl,0.35*intF);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(hitB_X,filmBot);ctx.lineTo(r2X,filmTop);ctx.stroke();
+    const r2G=ctx.createLinearGradient(r2X,filmTop,r2_topX,filmTop-40);
+    r2G.addColorStop(0,wavToRGB(wl,0.45*intF));r2G.addColorStop(1,'transparent');
+    ctx.strokeStyle=r2G;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(r2X,filmTop);ctx.lineTo(r2_topX,filmTop-40);ctx.stroke();
+
+    glowAt(hitT_X,filmTop,6,wavToRGB(wl,0.4));
+    glowAt(hitB_X,filmBot,6,wavToRGB(wl,0.3));
+  }
+
+  // Interference result
+  const resultCol=isConstructive?'rgba(0,229,160,0.9)':iDestr?'rgba(255,64,96,0.9)':'rgba(255,179,0,0.8)';
+  const resultText=isConstructive?'CONSTRUCTIVE INTERFERENCE':iDestr?'DESTRUCTIVE INTERFERENCE':'PARTIAL INTERFERENCE';
+  ctx.fillStyle=resultCol;ctx.font='13px JetBrains Mono';
+  ctx.fillText(resultText,W/2-130,H*0.8);
+
+  if(S.showAnnot) {
+    ctx.fillStyle='rgba(0,200,255,0.6)';ctx.font='10px JetBrains Mono';
+    ctx.fillText(`OPD = 2nt = ${OPD.toFixed(1)} nm`,W*0.02,H-40);
+    ctx.fillText(`OPD/λ = ${order.toFixed(3)}  (m=${Math.round(order)})`,W*0.02,H-24);
+    ctx.fillText(`Constructive: 2nt = mλ  |  Destructive: 2nt = (m+½)λ`,W*0.02,H-8);
+  }
+}
+
+// ==================== INTENSITY MINI-CHART ====================
+function drawMiniChart() {
+  const W=miniC.width, H=miniC.height;
+  miniCtx.fillStyle='#080c18';
+  miniCtx.fillRect(0,0,W,H);
+  miniCtx.strokeStyle='rgba(28,42,69,0.5)';miniCtx.lineWidth=0.5;
+  for(let x=0;x<W;x+=W/8){miniCtx.beginPath();miniCtx.moveTo(x,0);miniCtx.lineTo(x,H);miniCtx.stroke();}
+  miniCtx.beginPath();miniCtx.moveTo(0,H/2);miniCtx.lineTo(W,H/2);miniCtx.stroke();
+
+  const intF=S.intensity/100;
+  const wl=S.wavelength;
+
+  if(['double_slit','single_slit'].includes(S.exp)) {
+    const nS=S.exp==='single_slit'?1:S.numSlits;
+    miniCtx.beginPath();
+    for(let x=0;x<W;x++) {
+      const theta=Math.atan2((x/W-0.5)*3,1);
+      const sinT=Math.sin(theta);
+      const k=2*Math.PI/(wl*1e-9)*1e-3;
+      const ab=k*(S.slitWidth*1e-6)*sinT/2;
+      const env=(Math.abs(ab)<0.001)?1:Math.pow(Math.sin(ab)/ab,2);
+      let I=env;
+      if(nS>1){const ph=k*(S.slitSep*1e-6)*sinT/(2*nS);I=env*Math.pow(Math.sin(nS*ph)/(nS*Math.sin(ph)||1),2);}
+      I=Math.max(0,Math.min(1,I))*intF;
+      const py=H-(I*H*0.9);
+      if(x===0) miniCtx.moveTo(x,py); else miniCtx.lineTo(x,py);
+    }
+    miniCtx.strokeStyle=wavToRGB(wl,0.9);miniCtx.lineWidth=1.5;miniCtx.stroke();
+  } else {
+    // Generic sine-like for other experiments
+    miniCtx.beginPath();
+    for(let x=0;x<W;x++) {
+      const I=Math.pow(Math.cos(x*Math.PI*3/W),2)*intF;
+      const py=H-(I*H*0.85);
+      if(x===0) miniCtx.moveTo(x,py); else miniCtx.lineTo(x,py);
+    }
+    miniCtx.strokeStyle=wavToRGB(wl,0.8);miniCtx.lineWidth=1.5;miniCtx.stroke();
+  }
+}
+
+// ==================== READOUTS UPDATE ====================
+function updateReadouts() {
+  const wl=S.wavelength;
+  const freq=(3e8/(wl*1e-9)/1e12).toFixed(1);
+  const energy=(1240/wl).toFixed(3);
+  document.getElementById('r_wavelength').textContent=`${wl} nm`;
+  document.getElementById('r_freq').textContent=`${freq} THz`;
+  document.getElementById('d_lambda').textContent=wl;
+  document.getElementById('d_freq').textContent=freq;
+  document.getElementById('d_energy').textContent=energy;
+  document.getElementById('infoWav_r','');
+
+  // Fringe spacing: Δy = λL/d
+  if(['double_slit','single_slit'].includes(S.exp)) {
+    const dy=(wl*1e-9*S.screenDist*1e-2)/(S.slitSep*1e-6)*1000;
+    const dyStr=dy.toFixed(2)+' mm';
+    document.getElementById('r_fringe').textContent=dyStr;
+    document.getElementById('d_fringe').textContent=dy.toFixed(3);
+    const m1=Math.asin(wl*1e-9/(S.slitSep*1e-6))*180/Math.PI;
+    document.getElementById('d_m1').textContent=isNaN(m1)?'—':m1.toFixed(2)+'°';
+    document.getElementById('d_ratio').textContent=(3e8/(wl*1e-9)).toExponential(3);
+    // Formulas
+    let formulas='';
+    if(S.exp==='double_slit'){
+      formulas=`Δy = λL/d = ${dy.toFixed(2)}mm\nPath diff = d·sinθ = mλ\nDark: d·sinθ = (m+½)λ\nSingle env: sinc²(πa·sinθ/λ)`;
+    } else {
+      const firstMin=Math.asin(wl*1e-9/(S.slitWidth*1e-6))*180/Math.PI;
+      formulas=`1st min: sinθ = λ/a\n→ θ = ${isNaN(firstMin)?'—':firstMin.toFixed(2)+'°'}\nCentral max width = 2λ/a\nI = I₀·sinc²(β/2)`;
+    }
+    document.getElementById('formula_box').textContent=formulas;
+  }
+
+  const n=S.refIndex;
+  if(n>1){document.getElementById('r_critical').textContent=`${(Math.asin(1/n)*180/Math.PI).toFixed(2)}°`;}
+  else {document.getElementById('r_critical').textContent='—';}
+}
+
+// ==================== LOG ====================
+function addLog(text,cls='entry') {
+  const log=document.getElementById('expLog');
+  const d=document.createElement('div');
+  d.className=`entry ${cls}`;
+  const now=new Date();
+  d.textContent=`[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}] ${text}`;
+  log.appendChild(d);
+  log.scrollTop=log.scrollHeight;
+  // Store in data
+  S.logData.push({time:now.toISOString(),exp:S.exp,wavelength:S.wavelength,intensity:S.intensity,angle:S.angle,slitWidth:S.slitWidth,slitSep:S.slitSep,screenDist:S.screenDist,numSlits:S.numSlits,focal:S.focal,radius:S.radius,objDist:S.objDist,refIndex:S.refIndex,note:text});
+}
+
+// ==================== EXPORT ====================
+function exportResults() {
+  const expNames={
+    double_slit:'Double Slit Experiment',single_slit:'Single Slit Experiment',
+    flat_mirror:'Flat Mirror',concave_mirror:'Concave Mirror',convex_mirror:'Convex Mirror',
+    convex_lens:'Convex Lens',concave_lens:'Concave Lens',refraction:'Snell\'s Refraction',
+    tir:'Total Internal Reflection',thin_film:'Thin Film Interference'
+  };
+
+  const wl=S.wavelength;
+  const freq=(3e8/(wl*1e-9)/1e12).toFixed(3);
+  const energy=(1240/wl).toFixed(4);
+  const dy=(wl*1e-9*S.screenDist*1e-2)/(S.slitSep*1e-6)*1000;
+  const critA=(S.refIndex>1)?((Math.asin(1/S.refIndex)*180/Math.PI).toFixed(3)):'N/A';
+  let u_s=-S.objDist*0.5; let f_s=S.focal*0.5;
+  let v_s=1/(1/f_s+1/u_s);
+  let m_calc=v_s/u_s;
+
+  let csvRows=[
+    ['Ahmed Ramadan — Optics Laboratory — Experiment Report'],
+    ['Generated',new Date().toLocaleString()],
+    ['Experiment',expNames[S.exp]||S.exp],
+    [''],
+    ['=== LIGHT SOURCE ==='],
+    ['Wavelength (nm)',wl],
+    ['Frequency (THz)',freq],
+    ['Photon Energy (eV)',energy],
+    ['Intensity (%)',S.intensity],
+    ['Incident Angle (°)',S.angle],
+    ['Source Type',S.sourceType],
+    [''],
+    ['=== SLIT / APERTURE ==='],
+    ['Slit Width a (μm)',S.slitWidth],
+    ['Slit Separation d (μm)',S.slitSep],
+    ['Screen Distance L (cm)',S.screenDist],
+    ['Number of Slits',S.numSlits],
+    [''],
+    ['=== OPTIC ELEMENT ==='],
+    ['Focal Length f (mm)',S.focal],
+    ['Radius of Curvature R (mm)',S.radius],
+    ['Object Distance u (mm)',S.objDist],
+    ['Aperture (mm)',S.aperture],
+    ['Refractive Index n',S.refIndex],
+    [''],
+    ['=== CALCULATED RESULTS ==='],
+    ['Fringe Spacing Δy (mm)',dy.toFixed(4)],
+    ['Image Distance v (mm)',Math.round(v_s)],
+    ['Magnification m',m_calc.toFixed(4)],
+    ['Critical Angle θc (°)',critA],
+    ['OPD = 2nt (nm)',(2*S.refIndex*S.slitWidth*2).toFixed(2)],
+    [''],
+    ['=== KEY FORMULAS ==='],
+    ['Double Slit','Δy = λL/d   |   d·sinθ = mλ'],
+    ['Single Slit','sinθ = mλ/a (minima)'],
+    ['Mirror Eq','1/v + 1/u = 1/f   |   f = R/2'],
+    ['Lens Eq','1/v - 1/u = 1/f'],
+    ['Snell Law','n₁sinθᵢ = n₂sinθₜ'],
+    ['Critical Angle','sinθc = n₁/n₂'],
+    ['Thin Film','2nt = mλ (constructive)'],
+    [''],
+    ['=== EXPERIMENT LOG ==='],
+    ['Time','Experiment','λ(nm)','I(%)','θ(°)','a(μm)','d(μm)','L(cm)','f(mm)','u(mm)','n','Note'],
+  ];
+  S.logData.forEach(r=>{
+    csvRows.push([r.time,r.exp,r.wavelength,r.intensity,r.angle,r.slitWidth,r.slitSep,r.screenDist,r.focal,r.objDist,r.refIndex,r.note]);
+  });
+
+  const csvStr=csvRows.map(r=>Array.isArray(r)?r.join(','):r).join('\n');
+  const blob=new Blob([csvStr],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`Ahmed_Ramadan_Optics_Lab_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  addLog('Results exported to CSV.','green');
+}
+
+// ==================== RENDER LOOP ====================
+function render(ts) {
+  const dt=ts-S.lastTime; S.lastTime=ts;
+  if(S.running) S.t+=dt*0.04;
+  S.frameCount++;
+  if(ts-S.fpsTimer>1000){
+    S.fps=S.frameCount;S.frameCount=0;S.fpsTimer=ts;
+    document.getElementById('fps_disp').textContent=`${S.fps} fps`;
+  }
+
+  const W=canvas.width, H=canvas.height;
+  ctx.fillStyle='#020408';ctx.fillRect(0,0,W,H);
+
+  switch(S.exp) {
+    case 'double_slit': expSlits(W,H,false); break;
+    case 'single_slit': expSlits(W,H,true); break;
+    case 'flat_mirror': expFlatMirror(W,H); break;
+    case 'concave_mirror': expCurvedMirror(W,H,true); break;
+    case 'convex_mirror': expCurvedMirror(W,H,false); break;
+    case 'convex_lens': expLens(W,H,true); break;
+    case 'concave_lens': expLens(W,H,false); break;
+    case 'refraction': expRefraction(W,H); break;
+    case 'tir': expTIR(W,H); break;
+    case 'thin_film': expThinFilm(W,H); break;
+  }
+
+  updateReadouts();
+  drawMiniChart();
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+
+// ==================== UI WIRING ====================
+// Tabs
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    S.exp=tab.dataset.exp;
+    const expNames={
+      double_slit:'DOUBLE SLIT',single_slit:'SINGLE SLIT',flat_mirror:'FLAT MIRROR',
+      concave_mirror:'CONCAVE MIRROR',convex_mirror:'CONVEX MIRROR',
+      convex_lens:'CONVEX LENS',concave_lens:'CONCAVE LENS',refraction:'SNELL REFRACTION',
+      tir:'TOTAL INT. REFL.',thin_film:'THIN FILM'
+    };
+    document.getElementById('badge_exp').textContent=expNames[S.exp]||S.exp;
+    addLog(`Switched to: ${expNames[S.exp]||S.exp}`,'accent');
+
+    // Show/hide relevant sections
+    const slitExps=['double_slit','single_slit','thin_film'];
+    const opticExps=['concave_mirror','convex_mirror','convex_lens','concave_lens','refraction','tir'];
+    document.getElementById('sec_slit').style.display=slitExps.includes(S.exp)?'block':
+      ['double_slit','single_slit'].includes(S.exp)?'block':'block';
+
+    // Update formula
+    const formulas={
+      double_slit:'Δy = λL/d\nd·sinθ = mλ (bright)\nd·sinθ = (m+½)λ (dark)',
+      single_slit:'sinθ = mλ/a (dark)\nΔy_central = 2λL/a',
+      flat_mirror:'θᵢ = θᵣ\nAngle of incidence = Angle of reflection',
+      concave_mirror:'1/v + 1/u = 1/f\nf = R/2\nm = -v/u',
+      convex_mirror:'1/v + 1/u = 1/f\nf = -R/2\nm = -v/u',
+      convex_lens:'1/v - 1/u = 1/f\nm = v/u',
+      concave_lens:'1/v - 1/u = 1/f\nf negative\nm = v/u',
+      refraction:'n₁sinθᵢ = n₂sinθₜ\nv = c/n',
+      tir:'sinθc = n₁/n₂\nTotal reflection when θ > θc',
+      thin_film:'OPD = 2nt\nConstructive: 2nt = mλ\nDestructive: 2nt = (m+½)λ'
+    };
+    document.getElementById('formula_box').textContent=formulas[S.exp]||'—';
+  });
+});
+
+// Sliders
+function slider(id,key,mult,unit,dispId,decimals=0,cls='') {
+  const el=document.getElementById(id);
+  const disp=document.getElementById(dispId);
+  el.addEventListener('input',()=>{
+    S[key]=parseFloat(el.value)*(mult||1);
+    disp.textContent=`${S[key].toFixed?S[key].toFixed(decimals):S[key]} ${unit}`;
+    if(id==='s_radius'){S.focal=S.radius/2;document.getElementById('v_focal').textContent=`${S.focal.toFixed(0)} mm`;}
+    if(id==='s_focal'){S.radius=S.focal*2;document.getElementById('v_radius').textContent=`${S.radius.toFixed(0)} mm`;}
+  });
+}
+slider('s_wavelength','wavelength',1,'nm','v_wavelength');
+slider('s_intensity','intensity',1,'%','v_intensity');
+slider('s_angle','angle',1,'°','v_angle');
+slider('s_beamWidth','beamWidth',1,'px','v_beamWidth');
+slider('s_slitWidth','slitWidth',1,'μm','v_slitWidth');
+slider('s_slitSep','slitSep',1,'μm','v_slitSep');
+slider('s_screenDist','screenDist',1,'cm','v_screenDist');
+slider('s_numSlits','numSlits',1,'','v_numSlits');
+slider('s_focal','focal',1,'mm','v_focal');
+slider('s_radius','radius',1,'mm','v_radius');
+slider('s_objDist','objDist',1,'mm','v_objDist');
+slider('s_aperture','aperture',1,'mm','v_aperture');
+document.getElementById('s_refIndex').addEventListener('input',function(){
+  S.refIndex=parseFloat(this.value)/100;
+  document.getElementById('v_refIndex').textContent=S.refIndex.toFixed(2);
+});
+document.getElementById('s_sourceType').addEventListener('change',function(){S.sourceType=this.value;});
+
+// Color buttons
+document.querySelectorAll('.color-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const wl=parseInt(btn.dataset.wl);
+    S.wavelength=wl;
+    document.getElementById('s_wavelength').value=wl;
+    document.getElementById('v_wavelength').textContent=`${wl} nm`;
+  });
+});
+
+// Toggles
+function toggle(id,key) {
+  const el=document.getElementById(id);
+  el.addEventListener('click',()=>{S[key]=!S[key];el.classList.toggle('on',S[key]);});
+}
+toggle('t_waves','showWaves');toggle('t_normals','showNormals');
+toggle('t_annot','showAnnot');toggle('t_arrows','showArrows');
+toggle('t_pattern','showPattern');toggle('t_virtual','showVirtual');
+toggle('t_grid','showGrid');
+
+// Buttons
+document.getElementById('playBtn').addEventListener('click',function(){
+  S.running=!S.running;
+  this.textContent=S.running?'⏸ PAUSE':'▶ PLAY';
+  document.getElementById('badge_live').textContent=S.running?'● LIVE':'◉ PAUSED';
+});
+document.getElementById('logBtn').addEventListener('click',()=>{
+  addLog(`Logged: λ=${S.wavelength}nm I=${S.intensity}% θ=${S.angle}° a=${S.slitWidth}μm d=${S.slitSep}μm f=${S.focal}mm u=${S.objDist}mm n=${S.refIndex}`,'amber');
+});
+document.getElementById('downloadBtn').addEventListener('click',exportResults);
+
+// Initial log
+setTimeout(()=>{
+  addLog('Double Slit experiment loaded.','accent');
+  addLog(`λ=${S.wavelength}nm, d=${S.slitSep}μm, L=${S.screenDist}cm`,'');
+},200);
+</script>
+</body>
+</html>
